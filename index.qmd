@@ -53,7 +53,7 @@ Secondly, according to the [RBA](https://www.rba.gov.au/education/resources/expl
 
 The 4 variables are transformed into a consistent format for analysis, in which each single data point is representing the percentage change from corresponding quarter of the previous year. Below lists out examples on how to interpret the data.
 
->*CPI*: at the December quarter of 2022, the annual CPI compared to the corresponding quarter of previous year increased 7.8%.
+
 
 ```{r inflation rate}
 #| echo: false
@@ -70,11 +70,10 @@ cpi                   = data.frame(cpi$Date, cpi$xts..xts.cpi_dwnld.value..cpi_d
 colnames(cpi)         = c("Date", "CPI")
 cpi$Date              = as.Date(as.character(cpi$Date))
 cpi_tmp               = cpi
-tail(cpi_tmp,2)
+# tail(cpi_tmp,2)
 # plot(cpi_tmp, type = "l")
 ```
 
-> *Cash Rate*: at the December quarter of 2022, the annual cash rate compared to the corresponding quarter of previous year is added on (increased) 270 basis points.
 
 ```{r cash rate}
 #| echo: false
@@ -92,11 +91,10 @@ q_avg_cashr           = data.frame(q_avg_cashr)
 q_avg_cashr$Date      = floor_date(as.Date(as.character(row.names(q_avg_cashr))),"month")  # adjust date to first day of each month to match cpi table
 cashr_tmp             = data.frame(q_avg_cashr$Date, q_avg_cashr$ROD)  # create a dataframe
 colnames(cashr_tmp)   = c("Date", "Cash_Rate")
-cashr_tmp[131:132,]
+# cashr_tmp[131:132,]
 # plot(cashr_tmp, type = "l")
 ```
 
->*Consumer Sentiment Index*: at the December quarter of 2022, the annual consumer sentiment index compared to the corresponding quarter of previous year decreased 23.0%. 
 
 ```{r consumer sentiment index}
 #| echo: false
@@ -120,11 +118,10 @@ quarter_avg           = data.frame(quarter_avg)
 quarter_avg$Date      = floor_date(as.Date(as.character(row.names(quarter_avg))), "month")  # adjust date to first day of each month to match cpi table
 csenti_tmp            = data.frame(quarter_avg$Date, quarter_avg$ROR)  # create a dataframe
 colnames(csenti_tmp)  = c("Date", "Consumer_Sentiment_Index")
-csenti_tmp[51:52,]
+# csenti_tmp[51:52,]
 # plot(csenti_tmp, type = "l")
 ```
 
->*Wage Price Index*: at the December quarter of 2022, the annual wage price index compared to the corresponding quarter of previous year increased 3.5%.
 
 ```{r wage price}
 #| echo: false
@@ -142,11 +139,11 @@ wage                 = data.frame(wage$Date, wage$xts..xts.wage_dwnld.value..wag
 colnames(wage)       = c("Date", "Hr_Wage")
 wage$Date            = as.Date(as.character(wage$Date))
 wage_tmp             = wage
-tail(wage_tmp,2)
+# tail(wage_tmp,2)
 # plot(wage_tmp, type = "l")
 ```
 
-A time series plot is displayed below to visualize how the 4 proposed variables vary throughout the past 12 years starting from March 2011 to December 2022. 
+
 
 ```{r all variables plot}
 #| echo: false
@@ -156,24 +153,33 @@ A time series plot is displayed below to visualize how the 4 proposed variables 
 ##combine all 4 variables in a dataframe. 
 combine1             = merge(cpi_tmp, cashr_tmp)
 combine2             = merge(combine1, csenti_tmp)
-variables_all        = merge(combine2, wage_tmp)[-c(1:4),]  # merge all 4 variables in to 1 dataframe
+variables_all        = merge(combine2, wage_tmp)[-c(1:4),]  
+
 colnames(variables_all) = c("Date", "CPI", "Cash Rate", "Consumer Senti", "Hr Wages")
+
+tail(variables_all,2)
+
+```
+>*CPI*: at the December quarter of 2022, the annual CPI compared to the corresponding quarter of previous year increased 7.8%.
+
+> *Cash Rate*: at the December quarter of 2022, the annual cash rate compared to the corresponding quarter of previous year is added on (increased) 270 basis points.
+
+>*Consumer Sentiment Index*: at the December quarter of 2022, the annual consumer sentiment index compared to the corresponding quarter of previous year decreased 23.0%. 
+
+>*Wage Price Index*: at the December quarter of 2022, the annual wage price index compared to the corresponding quarter of previous year increased 3.5%.
+
+A time series plot is displayed below to visualize how the 4 proposed variables vary throughout the past 12 years starting from March 2011 to December 2022, including 48 quarterly observations of year on year changes. 
+
+```{r}
 ts_plot(variables_all,
         type = "multiple", title = FALSE,
         Xgrid = TRUE
 )
-
-# plot.variables_all = variables_all[2:5]
-# plot.ts(plot.variables_all,
-#        mar.multi = c(0, 10, 0, 10),
-#        oma.multi = c(0, 0, 0, 0), axes = TRUE
-#        )
-
 ```
 
 According to the tendency, they are non stationary with time-varying volatility. Here are some findings,  
 
--   All 4 variables tend to be stable from 2014 to 2020, during which periods, the CPI remains around the target level 2-3 per cent, hence no large and active monetary policy is observed given the fact that the cash rate is flat out around 0. In addition, under the stable economy condition, consumers' views of the economy don't shift much, staying around 0 as well.
+-   All 4 variables tend to be stable from 2014 to 2020, during which periods, the year to year CPI change remains around the target level 2-3 per cent, hence no large and active monetary policy is observed given the fact that the cash rate is flat out around 0. In addition, under the stable economy condition, consumers' views of the economy don't shift much, the change staying around 0 as well.
 
 -   After 2020, when entering into the post pandemic it starts to introduce large volatility. As the inflation rises, the cash rate shows some lagging reaction. The large increase of cash rate happened at the time when the inflation is already peaked. This makes sense as the current economic condition is one of the considerations for the monetary policy. Interestingly, consumers tend to have strong confidence on the economy when the inflation begins to rise, and gradually lose the confidence when the inflation rises way too high. It is reasonable to see how people adjust their views based on the new economic information they receive and perceive. Wage level, however, looks to be more consistent with the increasing in inflation, which may also be understandable in the way that wage as a cost-push would interact with the inflation more closely. Wage cost pushes up inflation, and in turn high inflation results in even more rising in the wage demand in order to match up with the basic living standard.
 
